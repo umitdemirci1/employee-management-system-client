@@ -1,5 +1,4 @@
-// import { Button } from "@/components/ui/button";
-import LoginForm from "@/components/auth/login/LoginForm";
+import CompanyLogin from "@/components/auth/company/CompanyLogin";
 import {
   Card,
   CardContent,
@@ -7,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function Page() {
+export default function Login() {
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <Card className="w-[350px] mb-24">
@@ -15,7 +14,7 @@ export default function Page() {
           <CardTitle>Login to company</CardTitle>
         </CardHeader>
         <CardContent>
-          <LoginForm />
+          <CompanyLogin />
         </CardContent>
       </Card>
     </div>

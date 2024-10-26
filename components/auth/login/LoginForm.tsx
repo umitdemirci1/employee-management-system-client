@@ -14,43 +14,91 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { login } from "@/services/auth/login/login";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  companyName: z.string().min(2, {
-    message: "Company name must be at least 2 characters.",
+  email: z.string().email({
+    message: "Invalid email address.",
   }),
+  password: z
+    .string()
+    .min(8, {
+      message: "Password must be at least 8 characters.",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter.",
+    })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter.",
+    })
+    .regex(/[0-9]/, {
+      message: "Password must contain at least one number.",
+    })
+    .regex(/[^a-zA-Z0-9]/, {
+      message: "Password must contain at least one special character.",
+    }),
 });
 
 export default function ProfileForm() {
-  // 1. Define your form.
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      companyName: "",
+      email: "",
+      password: "",
     },
   });
-
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  // values: z.infer<typeof formSchema>
+  async function onSubmit() {
+    try {
+      const isOk = await login(
+        form.getValues("email"),
+        form.getValues("password")
+      );
+      if (isOk) {
+        router.push(`/somewhere`);
+      } else {
+        form.setError("email", {
+          type: "manual",
+          message: "Login failed. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("There was a problem with the fetch operation:", error);
+      form.setError("email", {
+        type: "manual",
+        message:
+          "There was a problem with the fetch operation. Please try again.",
+      });
+    }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="companyName"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Enter your EMS Domain to login</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <div className="flex items-center">
-                  <Input placeholder="companydomain" {...field} />
-                  <span className="ml-2">.ems.com</span>
-                </div>
+                <Input placeholder="e-mail" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input placeholder="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
