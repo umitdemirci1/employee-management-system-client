@@ -1,15 +1,15 @@
-import CompanyLogin from "@/components/auth/company/CompanyLogin";
+import AdminLoginForm from "@/components/auth/admin/login/AdminLoginForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Login() {
+export default function AdminLogin() {
   return (
     <div className="flex justify-center items-center h-[100vh]">
       <Card className="w-[350px] mb-24">
         <CardHeader>
-          <CardTitle>Login to company</CardTitle>
+          <CardTitle>Login to EMS Admin Panel</CardTitle>
         </CardHeader>
         <CardContent>
-          <CompanyLogin />
+          <AdminLoginForm />
         </CardContent>
       </Card>
     </div>
