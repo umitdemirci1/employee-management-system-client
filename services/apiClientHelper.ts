@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7161/api";
 
@@ -14,10 +15,10 @@ class ApiClientHelper {
     return ApiClientHelper.instance;
   }
 
-  private async createRequest(method: string, endpoint: string, body?: any): Promise<RequestInit> {
+  private createRequestConfig(method: string, endpoint: string, body?: any): AxiosRequestConfig {
     const token = Cookies.get("jwtToken");
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
@@ -25,70 +26,46 @@ class ApiClientHelper {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const options: RequestInit = {
+    const config: AxiosRequestConfig = {
       method,
+      url: `${API_BASE_URL}${endpoint}`,
       headers,
     };
 
     if (body) {
-      options.body = JSON.stringify(body);
+      config.data = body;
     }
 
-    return options;
+    return config;
   }
 
-  public async get<T>(endpoint: string): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const options = await this.createRequest("GET", endpoint);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Network response was not ok");
-    }
-    return response.json();
+  public async get<T>(endpoint: string): Promise<AxiosResponse<T>> {
+    const config = this.createRequestConfig("GET", endpoint);
+    const response = await axios(config);
+    return response;
   }
 
-  public async post<T>(endpoint: string, body: any): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const options = await this.createRequest("POST", endpoint, body);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Network response was not ok");
-    }
-    return response.json();
+  public async post<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+    const config = this.createRequestConfig("POST", endpoint, body);
+    const response = await axios(config);
+    return response;
   }
 
-  public async put<T>(endpoint: string, body: any): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const options = await this.createRequest("PUT", endpoint, body);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Network response was not ok");
-    }
-    return response.json();
+  public async put<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+    const config = this.createRequestConfig("PUT", endpoint, body);
+    const response = await axios(config);
+    return response;
   }
 
-  public async patch<T>(endpoint: string, body: any): Promise<T> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const options = await this.createRequest("PATCH", endpoint, body);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Network response was not ok");
-    }
-    return response.json();
+  public async patch<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+    const config = this.createRequestConfig("PATCH", endpoint, body);
+    const response = await axios(config);
+    return response;
   }
 
   public async delete(endpoint: string): Promise<void> {
-    const url = `${API_BASE_URL}${endpoint}`;
-    const options = await this.createRequest("DELETE", endpoint);
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Network response was not ok");
-    }
+    const config = this.createRequestConfig("DELETE", endpoint);
+    await axios(config);
   }
 }
 
