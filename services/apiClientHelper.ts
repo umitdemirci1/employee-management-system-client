@@ -1,7 +1,9 @@
 import Cookies from "js-cookie";
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
+import { ApiResponse } from "../types/apiResponse";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7161/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7161/api";
 
 class ApiClientHelper {
   private static instance: ApiClientHelper;
@@ -15,7 +17,11 @@ class ApiClientHelper {
     return ApiClientHelper.instance;
   }
 
-  private createRequestConfig(method: string, endpoint: string, body?: any): AxiosRequestConfig {
+  private createRequestConfig(
+    method: string,
+    endpoint: string,
+    body?: any
+  ): AxiosRequestConfig {
     const token = Cookies.get("jwtToken");
 
     const headers: Record<string, string> = {
@@ -39,33 +45,34 @@ class ApiClientHelper {
     return config;
   }
 
-  public async get<T>(endpoint: string): Promise<AxiosResponse<T>> {
+  public async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     const config = this.createRequestConfig("GET", endpoint);
     const response = await axios(config);
-    return response;
+    return response.data;
   }
 
-  public async post<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+  public async post<T>(endpoint: string, body: any): Promise<ApiResponse<T>> {
     const config = this.createRequestConfig("POST", endpoint, body);
     const response = await axios(config);
-    return response;
+    return response.data;
   }
 
-  public async put<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+  public async put<T>(endpoint: string, body: any): Promise<ApiResponse<T>> {
     const config = this.createRequestConfig("PUT", endpoint, body);
     const response = await axios(config);
-    return response;
+    return response.data;
   }
 
-  public async patch<T>(endpoint: string, body: any): Promise<AxiosResponse<T>> {
+  public async patch<T>(endpoint: string, body: any): Promise<ApiResponse<T>> {
     const config = this.createRequestConfig("PATCH", endpoint, body);
     const response = await axios(config);
-    return response;
+    return response.data;
   }
 
-  public async delete(endpoint: string): Promise<void> {
+  public async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     const config = this.createRequestConfig("DELETE", endpoint);
-    await axios(config);
+    const response = await axios(config);
+    return response.data;
   }
 }
 
